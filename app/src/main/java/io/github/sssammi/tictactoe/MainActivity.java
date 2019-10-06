@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity
     Integer nTurnCount = 0;
 
     // define the SharedPreferences object
-    private SharedPreferences savedValues;
+//    private SharedPreferences savedValues;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,32 +50,32 @@ public class MainActivity extends AppCompatActivity
         }
 
         // get SharedPreferences object
-        savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
+//        savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
     }
 
-    @Override
-    public void onPause() {
-        // save the instance variables
-        SharedPreferences.Editor editor = savedValues.edit();
-//        editor.putString("billAmountString", billAmountString);
-//        editor.putFloat("tipPercent", tipPercent);
-//        editor.putInt("rounding", rounding);
-//        editor.putInt("split", split);
-        editor.commit();
+//    @Override
+//    public void onPause() {
+//        // save the instance variables
+//        SharedPreferences.Editor editor = savedValues.edit();
+////        editor.putString("billAmountString", billAmountString);
+////        editor.putFloat("tipPercent", tipPercent);
+////        editor.putInt("rounding", rounding);
+////        editor.putInt("split", split);
+//        editor.commit();
+//
+//        super.onPause();
+//    }
 
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // get the instance variables
-//        billAmountString = savedValues.getString("billAmountString", "");
-//        tipPercent = savedValues.getFloat("tipPercent", 0.15f);
-//        rounding = savedValues.getInt("rounding", ROUND_NONE);
-//        split = savedValues.getInt("split", 1);
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//
+//        // get the instance variables
+////        billAmountString = savedValues.getString("billAmountString", "");
+////        tipPercent = savedValues.getFloat("tipPercent", 0.15f);
+////        rounding = savedValues.getInt("rounding", ROUND_NONE);
+////        split = savedValues.getInt("split", 1);
+//    }
 
     @Override
     public boolean onEditorAction(TextView textViewV, int nId, KeyEvent keyEventEvt){
@@ -152,20 +152,58 @@ public class MainActivity extends AppCompatActivity
                 aButtons[2][2].setText(turn);
                 break;
         }
-        checkWin();
-        //Toast.makeText(this, turn + " Turn count: " + nTurnCount, Toast.LENGTH_LONG).show();
 
+        // call to check for a win, and if this is the 9th turn, we will declare a draw
+        if(checkWin()){
+            for(int j = 0; j < 3; j++){
+                for(int i = 0; i < 3; i++){
+                    this.aButtons[i][j].setText("");
+                }
+            }
+            this.textDisplayMsg.setText("Player " + turn + " wins!");
+        } else if (nTurnCount == 9){
+            this.textDisplayMsg.setText("It's a draw! Please play again.");
+        }
     }
 
-    private void checkWin() {
+    private boolean checkWin() {
         //check to see if win condition is true
-        //check turn count, if 9, this is the last turn (evaluate for tie)
-        Boolean win = false;
-        //while(win == false) {
-            String row1 = aButtons[0][0].getText().toString() + aButtons[0][1].getText().toString() + aButtons[0][2].getText().toString();
-            Toast.makeText(this, row1, Toast.LENGTH_LONG).show();
+        String[][] aFields = new String[3][3];
 
-        //}
+        //turn all the buttons' values into strings so we can compare them
+        for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                aFields[i][j] = aButtons[i][j].getText().toString();
+            }
+        }
 
+        //checking for a 'row win'
+        for (int i = 0; i < 3; i++){
+            if(aFields[i][0].equals(aFields[i][1])
+                    && aFields[i][0].equals(aFields[i][2]) && !aFields[i][0].equals("")){
+                return true;
+            }
+        }
+
+        //checking for 'column win'
+        for (int i = 0; i < 3; i++){
+            if(aFields[0][i].equals(aFields[1][i])
+                    && aFields[0][i].equals(aFields[2][i]) && !aFields[0][i].equals("")){
+                return true;
+            }
+        }
+
+        //checking for both diagonal wins
+        //top left to bottom right
+        if(aFields[0][0].equals(aFields[1][1])
+                && aFields[1][1].equals(aFields[2][2]) && !aFields[0][0].equals("")){
+            return true;
+        }
+        //top right to bottom left
+        if(aFields[0][2].equals(aFields[1][1])
+                && aFields[1][1].equals(aFields[2][0]) && !aFields[0][2].equals("")){
+            return true;
+        }
+        return false;
     }
 }
