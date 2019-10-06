@@ -3,6 +3,7 @@ package io.github.sssammi.tictactoe;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -17,9 +18,10 @@ public class MainActivity extends AppCompatActivity
     TextView textDisplayMsg;
     Button btnNewGame;
     Integer nTurnCount = 0;
+    String turn = "";
 
     // define the SharedPreferences object
-//    private SharedPreferences savedValues;
+    private SharedPreferences savedValues;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,32 +52,33 @@ public class MainActivity extends AppCompatActivity
         }
 
         // get SharedPreferences object
-//        savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
+        savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
     }
 
-//    @Override
-//    public void onPause() {
-//        // save the instance variables
-//        SharedPreferences.Editor editor = savedValues.edit();
-////        editor.putString("billAmountString", billAmountString);
-////        editor.putFloat("tipPercent", tipPercent);
-////        editor.putInt("rounding", rounding);
-////        editor.putInt("split", split);
-//        editor.commit();
-//
-//        super.onPause();
-//    }
+    @Override
+    public void onPause() {
+        // save the instance variables
+        SharedPreferences.Editor editor = savedValues.edit();
+        editor.putInt("nTurnCount", nTurnCount);
+        editor.putString("turn", turn);
+        editor.commit();
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//        // get the instance variables
-////        billAmountString = savedValues.getString("billAmountString", "");
-////        tipPercent = savedValues.getFloat("tipPercent", 0.15f);
-////        rounding = savedValues.getInt("rounding", ROUND_NONE);
-////        split = savedValues.getInt("split", 1);
-//    }
+        super.onPause();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // get the instance variables
+        nTurnCount = savedValues.getInt("nTurnCount", nTurnCount);
+        turn = savedValues.getString("turn", turn);
+//        billAmountString = savedValues.getString("billAmountString", "");
+//        tipPercent = savedValues.getFloat("tipPercent", 0.15f);
+//        rounding = savedValues.getInt("rounding", ROUND_NONE);
+//        split = savedValues.getInt("split", 1);
+    }
 
     @Override
     public boolean onEditorAction(TextView textViewV, int nId, KeyEvent keyEventEvt){
@@ -85,35 +88,27 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v){
-        nTurnCount++;
         Integer viewId = v.getId();
-        String turn = "";
-        while(nTurnCount < 10){}
 
         //check whose turn it is now
         if (nTurnCount % 2 == 1)
         {
-            turn="X";
-        }
-        else if (nTurnCount % 2 == 0) {
             turn="O";
         }
-        this.textDisplayMsg.setText("Player " + turn + "\'s turn");
+        else if (nTurnCount % 2 == 0) {
+            turn="X";
+        }
 
         switch(v.getId())
         {
             case R.id.btnNewGame:
                 // clear all the buttons and set turn count back to zero
                 nTurnCount = 0;
-                aButtons[0][0].setText("");
-                aButtons[0][1].setText("");
-                aButtons[0][2].setText("");
-                aButtons[1][0].setText("");
-                aButtons[1][1].setText("");
-                aButtons[1][2].setText("");
-                aButtons[2][0].setText("");
-                aButtons[2][1].setText("");
-                aButtons[2][2].setText("");
+                for(int j = 0; j < 3; j++){
+                    for(int i = 0; i < 3; i++){
+                        this.aButtons[i][j].setText("");
+                    }
+                }
                 this.textDisplayMsg.setText("Player X's turn");
                 break;
             case R.id.button00:
@@ -160,9 +155,20 @@ public class MainActivity extends AppCompatActivity
                     this.aButtons[i][j].setText("");
                 }
             }
+            nTurnCount = 0;
             this.textDisplayMsg.setText("Player " + turn + " wins!");
         } else if (nTurnCount == 9){
             this.textDisplayMsg.setText("It's a draw! Please play again.");
+        } else {
+            nTurnCount++;
+            if (nTurnCount % 2 == 1)
+            {
+                turn="O";
+            }
+            else if (nTurnCount % 2 == 0) {
+                turn="X";
+            }
+            this.textDisplayMsg.setText("Player " + turn + "\'s turn");
         }
     }
 
